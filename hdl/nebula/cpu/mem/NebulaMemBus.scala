@@ -23,8 +23,7 @@ object NebulaMemBus {
  */
 case class NebulaMemBus(
     cfg:        NebulaCfg,
-    dataOnly:   Boolean = false,
-    insnOnly:   Boolean = false
+    readonly:   Boolean = false
 ) extends Bundle with IMasterSlave {
     /** Transaction state. */
     val mode    = NebulaMemBus.Mode()
@@ -33,12 +32,12 @@ case class NebulaMemBus(
     /** Memory address. */
     val addr    = UInt(cfg.vaddrWidth bits)
     /** Memory write data. */
-    val wdata   = !insnOnly generate Bits(cfg.XLEN bits)
+    val wdata   = !readonly generate Bits(cfg.memWidth bits)
     
     /** Memory response ready. */
     val ready   = Bool()
     /** Memory read / execute data. */
-    val rdata   = Bits(cfg.XLEN bits)
+    val rdata   = Bits(cfg.memWidth bits)
     /** Access generated trap. */
     val trap    = Bool()
     /** Generated trap number. */
@@ -54,9 +53,9 @@ case class NebulaMemBus(
         val ahb = master(AhbLite3Master(AhbLite3Config(addr.getWidth, rdata.getWidth)))
         
         // Request translation.
-        if (insnOnly) {
+        when (mode === NebulaMemBus.Mode.EXEC) {
             ahb.HPROT := B"1110"
-        } else {
+        } otherwise {
             ahb.HPROT := B"1111"
         }
         ahb.HMASTLOCK := False
@@ -69,7 +68,7 @@ case class NebulaMemBus(
         )
         ahb.HBURST := B"000"
         ahb.HWRITE := mode === NebulaMemBus.Mode.WRITE
-        if (insnOnly) {
+        if (readonly) {
             ahb.HWDATA.assignDontCare()
         } else {
             ahb.HWDATA.setAsReg()
