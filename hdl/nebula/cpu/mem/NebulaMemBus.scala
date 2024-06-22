@@ -48,9 +48,11 @@ case class NebulaMemBus(
         in(ready, rdata, trap, cause)
     }
     
-    /** Adapt to an AHB-lite-3 master. */
-    def toAhbLite3: AhbLite3Master = {
-        val ahb = master(AhbLite3Master(AhbLite3Config(addr.getWidth, rdata.getWidth)))
+    /** Adapt to an AhbLite3. */
+    def toAhbLite3: AhbLite3 = toAhbLite3Master.toAhbLite3
+    /** Adapt to an AhbLite3Master. */
+    def toAhbLite3Master: AhbLite3Master = {
+        val ahb = AhbLite3Master(AhbLite3Config(addr.getWidth, rdata.getWidth))
         
         // Request translation.
         when (mode === NebulaMemBus.Mode.EXEC) {

@@ -1,7 +1,7 @@
 
 # Copyright © 2024, Julian Scheffers, see LICENSE for info
 
-.PHONY: all cmod vhdl sim wave clean
+.PHONY: all build vhdl sim wave clean
 
 MAKEFLAGS += --silent
 
@@ -15,8 +15,8 @@ all:
 	echo '$(SIM)'
 	echo '$(WAVE)'
 
-cmod:
-	sbt "runMain nebula.nest.CmodA7Verilog"
+build:
+	sbt compile
 
 $(SIM):
 	sbt "runMain nebula.sim.$(@F)"

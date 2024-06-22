@@ -9,7 +9,6 @@ import spinal.lib._
 import nebula.cpu.mem._
 import nebula.cpu._
 
-/** Dummy testbench that's just a wire from `din_a` to `dout_a`. */
 case class MemAdapterBench(cfg: NebulaCfg) extends Component {
     val io = new Bundle {
         val nmem = slave(NebulaMemBus(cfg))
